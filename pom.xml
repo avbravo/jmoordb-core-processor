@@ -12,6 +12,14 @@
      
     </properties>
     
+    <dependencies>
+            <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <!--<version>4.0.6</version>-->
+            <version>4.6.0</version>
+        </dependency>
+        </dependencies>
      <build>
         <plugins>
             <plugin>
