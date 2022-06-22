@@ -53,10 +53,10 @@ public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
                     error = true;
                 }
 
-                error = !checkIdValidity(repository.entity(), element);
+                error = !checkIdValidity(repository.entity().getName(), element);
 
                 if (!error) {
-                    uniqueIdCheckList.add(repository.entity());
+                    uniqueIdCheckList.add(repository.entity().getName());
                     try {
                         generateClass(repository, element);
                     } catch (Exception e) {
@@ -218,7 +218,7 @@ Import
 
             //generate build() method of the builder class.
             MethodProcessor buildMethod = new MethodProcessor()
-                    .defineSignature("public", false, repository.entity())
+                    .defineSignature("public", false, repository.entity().getName())
                     .name("build");
             StringBuilder buildBody = new StringBuilder();
             buildBody.append(repository.entity())

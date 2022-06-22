@@ -13,7 +13,8 @@ public @interface Repository {
      * valid/unique java qualifier name
      * @return
      */
-    String entity();
+ //   String entity();
+    Class entity();
 
     /**
      * If true a corresponding builder (based on builder design pattern)
