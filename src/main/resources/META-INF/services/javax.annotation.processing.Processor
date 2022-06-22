@@ -1,1 +1,2 @@
 com.avbravo.jmoordb.core.processor.AutoGenerateProcessor
+com.avbravo.jmoordb.core.processor.RepositoryAutoGenerateProcessor

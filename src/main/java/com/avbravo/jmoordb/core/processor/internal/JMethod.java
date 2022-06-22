@@ -1,4 +1,4 @@
-package com.avbravo.jmoordb.core.processor;
+package com.avbravo.jmoordb.core.processor.internal;
 
 import java.util.SortedMap;
 

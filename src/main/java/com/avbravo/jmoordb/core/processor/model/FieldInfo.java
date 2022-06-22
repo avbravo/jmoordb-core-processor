@@ -1,4 +1,4 @@
-package com.avbravo.jmoordb.core.processor;
+package com.avbravo.jmoordb.core.processor.model;
 
 
 import com.avbravo.jmoordb.core.annotation.Mandatory;

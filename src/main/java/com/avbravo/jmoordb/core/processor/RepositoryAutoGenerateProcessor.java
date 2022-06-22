@@ -1,9 +1,9 @@
 package com.avbravo.jmoordb.core.processor;
 
+import com.avbravo.jmoordb.core.annotation.Repository;
 import com.avbravo.jmoordb.core.processor.internal.JClass;
 import com.avbravo.jmoordb.core.processor.internal.JMethod;
 import com.avbravo.jmoordb.core.processor.model.FieldInfo;
-import com.avbravo.jmoordb.core.annotation.AutoImplement;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -23,42 +23,42 @@ import java.io.Writer;
 import java.util.*;
 
 @SupportedAnnotationTypes(
-        {"com.avbravo.jmoordb.core.annotation.AutoImplement"})
+        {"com.avbravo.jmoordb.core.annotation.Repository"})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
-public class AutoGenerateProcessor extends AbstractProcessor {
+public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
 
+    // <editor-fold defaultstate="collapsed" desc=" boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)">
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (annotations.size() == 0) {
             return false;
         }
 
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(AutoImplement.class);
-
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Repository.class);
 
         List<String> uniqueIdCheckList = new ArrayList<>();
 
         for (Element element : elements) {
-            AutoImplement autoImplement = element.getAnnotation(AutoImplement.class);
+            Repository repository = element.getAnnotation(Repository.class);
 
             if (element.getKind() != ElementKind.INTERFACE) {
-                error("The annotation @AutoImplement can only be applied on interfaces: ",
+                error("The annotation @Repository can only be applied on interfaces: ",
                         element);
 
             } else {
                 boolean error = false;
 
-                if (uniqueIdCheckList.contains(autoImplement.as())) {
-                    error("AutoImplement#as should be uniquely defined", element);
+                if (uniqueIdCheckList.contains(repository.entity())) {
+                    error("Repository #as should be uniquely defined", element);
                     error = true;
                 }
 
-                error = !checkIdValidity(autoImplement.as(), element);
+                error = !checkIdValidity(repository.entity(), element);
 
                 if (!error) {
-                    uniqueIdCheckList.add(autoImplement.as());
+                    uniqueIdCheckList.add(repository.entity());
                     try {
-                        generateClass(autoImplement, element);
+                        generateClass(repository, element);
                     } catch (Exception e) {
                         error(e.getMessage(), null);
                     }
@@ -68,7 +68,9 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void generateClass(AutoImplement autoImplement, Element element)
+    // </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="generateClass(Repository repository, Element element)">
+    private void generateClass(Repository repository, Element element)
             throws Exception {
 
         String pkg = getPackageName(element);
@@ -82,16 +84,70 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         //using our JClass to delegate most of the string appending there
         JClass implClass = new JClass();
         implClass.definePackage(pkg);
-        implClass.defineClass("public class ", autoImplement.as(), "implements " + interfaceName);
+//        implClass.defineClass("public class ", repository.entity(), interfaceName+"Impl implements " + interfaceName);
+/*
+Import
+         */
+implClass.addEditorFoldStart("imports");
+        if (!repository.jakarta()) {
+            /*
+            Java EE
+             */
+            implClass.addImport("javax.enterprise.context.ApplicationScoped");
+            implClass.addImport("javax.inject.Inject");
+            implClass.addImport("javax.json.bind.Jsonb");
+            implClass.addImport("javax.json.bind.JsonbBuilder");
+        } else {
+            /**
+             * Jakarta EE
+             */
+            implClass.addImport("jakarta.enterprise.context.ApplicationScoped");
+            implClass.addImport("jakarta.inject.Inject");
+            implClass.addImport("jakarta.json.bind.Jsonb");
+            implClass.addImport("jakarta.json.bind.JsonbBuilder");
+
+        }
+        /**
+         * Microprofile
+         */
+        implClass.addImport("org.eclipse.microprofile.config.Config");
+        implClass.addImport("org.eclipse.microprofile.config.inject.ConfigProperty");
+        /**
+         * MongoDB
+         */
+        implClass.addImport("com.mongodb.client.MongoDatabase;");
+        implClass.addImport("static com.mongodb.client.model.Filters.eq");
+        implClass.addImport("com.mongodb.client.MongoClient");
+        implClass.addImport("com.mongodb.client.MongoCollection");
+        implClass.addImport("com.mongodb.client.MongoCursor");
+
+        implClass.addImport("java.util.ArrayList");
+        implClass.addImport("java.util.List");
+        implClass.addImport("java.util.Optional");
+implClass.addEditorFoldEnd();
+        /*
+        
+         */
+        implClass.defineClass("public class ", interfaceName + "Impl", " implements " + interfaceName);
+
+        /**
+         * Inject
+         */
+        implClass.addEditorFoldStart("inject");
+        implClass.addComment("Microprofile Config");
+
+        implClass.addInject("private Config config");
+        implClass.addInject("MongoClient mongoClient");
+        implClass.addEditorFoldEnd();
 
         //nested builder class
         JClass builder = null;
         String builderClassName = null;
 
-        if (autoImplement.builder()) {
+        if (repository.jakarta()) {
             builder = new JClass();
             builder.defineClass("public static class",
-                    builderClassName = autoImplement.as() + "Builder", null);
+                    builderClassName = repository.entity() + "Builder", null);
         }
 
         //adding class fields
@@ -140,7 +196,6 @@ public class AutoGenerateProcessor extends AbstractProcessor {
                     .defineSignature("public", true, builderClassName)
                     .name("create");
 
-
             String paramString = "(";
             int i = 0;
             for (String s : fieldInfo.getMandatoryFields()) {
@@ -157,12 +212,12 @@ public class AutoGenerateProcessor extends AbstractProcessor {
 
             //generate build() method of the builder class.
             JMethod buildMethod = new JMethod()
-                    .defineSignature("public", false, autoImplement.as())
+                    .defineSignature("public", false, repository.entity())
                     .name("build");
             StringBuilder buildBody = new StringBuilder();
-            buildBody.append(autoImplement.as())
+            buildBody.append(repository.entity())
                     .append(" a = new ")
-                    .append(autoImplement.as())
+                    .append(repository.entity())
                     .append(paramString)
                     .append(JClass.LINE_BREAK);
             for (String s : fieldInfo.getFields().keySet()) {
@@ -185,37 +240,44 @@ public class AutoGenerateProcessor extends AbstractProcessor {
 
         }
         //finally generate class via Filer
-        generateClass(pkg + "." + autoImplement.as(), implClass.end());
+//        generateClass(pkg + "." + repository.entity(), implClass.end());
+        generateClass(pkg + "." + interfaceName + "Impl", implClass.end());
     }
+// </editor-fold>
+    // <editor-fold defaultstate="collapsed" desc="String getPackageName(Element element)">
 
     private String getPackageName(Element element) {
-        List<PackageElement> packageElements =
-                ElementFilter.packagesIn(Arrays.asList(element.getEnclosingElement()));
+        List<PackageElement> packageElements
+                = ElementFilter.packagesIn(Arrays.asList(element.getEnclosingElement()));
 
         Optional<PackageElement> packageElement = packageElements.stream().findAny();
-        return packageElement.isPresent() ?
-                packageElement.get().getQualifiedName().toString() : null;
+        return packageElement.isPresent()
+                ? packageElement.get().getQualifiedName().toString() : null;
 
     }
+// </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="generateClass(String qfn, String end)">
     private void generateClass(String qfn, String end) throws IOException {
         JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(qfn);
         Writer writer = sourceFile.openWriter();
         writer.write(end);
         writer.close();
     }
+// </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="boolean checkIdValidity(String name, Element e)">
     /**
-     * Checking if the class to be generated is a valid java identifier
-     * Also the name should be not same as the target interface
+     * Checking if the class to be generated is a valid java identifier Also the
+     * name should be not same as the target interface
      */
     private boolean checkIdValidity(String name, Element e) {
         boolean valid = true;
         for (int i = 0; i < name.length(); i++) {
-            if (i == 0 ? !Character.isJavaIdentifierStart(name.charAt(i)) :
-                    !Character.isJavaIdentifierPart(name.charAt(i))) {
-                error("AutoImplement#as should be valid java " +
-                        "identifier for code generation: " + name, e);
+            if (i == 0 ? !Character.isJavaIdentifierStart(name.charAt(i))
+                    : !Character.isJavaIdentifierPart(name.charAt(i))) {
+                error("Repository #as should be valid java "
+                        + "identifier for code generation: " + name, e);
                 valid = false;
             }
         }
@@ -224,7 +286,9 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         }
         return valid;
     }
+// </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="String getTypeName(Element e)">
     /**
      * Get the simple name of the TypeMirror
      */
@@ -233,8 +297,11 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         String[] split = typeMirror.toString().split("\\.");
         return split.length > 0 ? split[split.length - 1] : null;
     }
+// </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="error(String msg, Element e)">
     private void error(String msg, Element e) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, e);
     }
+    // </editor-fold>
 }
