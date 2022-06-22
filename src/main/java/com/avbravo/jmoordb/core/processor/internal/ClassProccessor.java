@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * This class only works if we add elements in proper sequence.
  */
-public class JClass {
+public class ClassProccessor {
 
     public static final String LINE_BREAK = System.getProperty("line.separator");
     public static String TAB="   ";
@@ -14,11 +14,17 @@ public class JClass {
     private String className;
     private Map<String, String> fields = new LinkedHashMap<>();
 
-    public JClass() {
+    public ClassProccessor() {
 
     }
 
-    public JClass definePackage(String packageName) {
+    // <editor-fold defaultstate="collapsed" desc="JClass definePackage(String packageName)">
+/**
+ * 
+ * @param packageName
+ * @return inserta en package en la clase
+ */
+    public ClassProccessor definePackage(String packageName) {
         if (packageName != null) {
             builder.append("package ")
                     .append(packageName)
@@ -27,6 +33,7 @@ public class JClass {
         }
         return this;
     }
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="JClass addImport(String importPackage)">
 /** 
@@ -34,7 +41,7 @@ public class JClass {
  * @param importPackage
  * @return 
  */
-    public JClass addImport(String importPackage) {
+    public ClassProccessor addImport(String importPackage) {
         builder.append("import ")
                 .append(importPackage)
                 .append(";")
@@ -48,7 +55,7 @@ public class JClass {
  * @param annotation
  * @return agrega anotaciones
  */
-    public JClass addAnnotations(String annotation) {
+    public ClassProccessor addAnnotations(String annotation) {
         builder.append(annotation)
                 .append(LINE_BREAK);
         return this;
@@ -60,7 +67,7 @@ public class JClass {
  * @param injectSentence
  * @return 
  */
-    public JClass addInject(String injectSentence) {
+    public ClassProccessor addInject(String injectSentence) {
         builder.append(TAB+"@Inject ")
                 .append(LINE_BREAK)
                 .append(TAB+injectSentence)
@@ -75,7 +82,7 @@ public class JClass {
  * @param comment
  * @return inserta comentarios
  */
-    public JClass addComment(String comment) {
+    public ClassProccessor addComment(String comment) {
         builder.append("/*")
                 .append(LINE_BREAK)
                 .append(TAB+comment)
@@ -92,7 +99,7 @@ public class JClass {
  * @param desc. -Utiloce \" si necesita incluir " en el texto
  * @return inserta un editor fold que sirve como ayuda a NetBeans IDE
  */
-    public JClass addEditorFoldStart(String desc) {
+    public ClassProccessor addEditorFoldStart(String desc) {
         builder.append("// <editor-fold defaultstate=\"collapsed\" desc=\"")
                 .append(desc)
                 .append("\">")                
@@ -106,7 +113,7 @@ public class JClass {
  * @param desc
  * @return cierra un editor fold que sirve como ayuda a NetBeans IDE
  */
-    public JClass addEditorFoldEnd() {
+    public ClassProccessor addEditorFoldEnd() {
         builder.append("// </editor-fold>")                    
                 .append(LINE_BREAK);
         return this;
@@ -121,7 +128,7 @@ public class JClass {
  * @param injectSentence
  * @return 
  */
-    public JClass addInjectConfigProperties(String  nameConfigProperty, String javatype, String javaNameVariable) {
+    public ClassProccessor addInjectConfigProperties(String  nameConfigProperty, String javatype, String javaNameVariable) {
         builder.append(TAB+"@Inject ")
                 .append(LINE_BREAK)
                 .append(TAB+"@ConfigProperty(name = \""+nameConfigProperty +"\")")
@@ -142,7 +149,7 @@ public class JClass {
  * @return 
  */
     
-    public JClass defineClass(String startPart, String name, String extendPart) {
+    public ClassProccessor defineClass(String startPart, String name, String extendPart) {
         className = name;
         builder.append(LINE_BREAK).append(LINE_BREAK)
                 .append(startPart)
@@ -165,7 +172,7 @@ public class JClass {
  * @param identifierToTypeMap
  * @return 
  */
-    public JClass addFields(LinkedHashMap<String, String> identifierToTypeMap) {
+    public ClassProccessor addFields(LinkedHashMap<String, String> identifierToTypeMap) {
         for (Map.Entry<String, String> entry : identifierToTypeMap.entrySet()) {
             addField(entry.getValue(), entry.getKey());
         }
@@ -175,7 +182,7 @@ public class JClass {
     
     // <editor-fold defaultstate="collapsed" desc="JClass addField(String type, String identifier)">
 
-    public JClass addField(String type, String identifier) {
+    public ClassProccessor addField(String type, String identifier) {
         fields.put(identifier, type);
         builder.append("private ")
                 .append(type)
@@ -195,7 +202,7 @@ public class JClass {
  * @param fieldsToBind
  * @return 
  */
-    public JClass addConstructor(String accessModifier, List<String> fieldsToBind) {
+    public ClassProccessor addConstructor(String accessModifier, List<String> fieldsToBind) {
         builder.append(LINE_BREAK)
                 .append(accessModifier)
                 .append(" ")
@@ -230,43 +237,43 @@ public class JClass {
 
     }
 // </editor-fold>
-    public JClass addConstructor(String accessModifier, boolean bindFields) {
+    public ClassProccessor addConstructor(String accessModifier, boolean bindFields) {
         addConstructor(accessModifier,
                 bindFields ? new ArrayList(fields.keySet())
                         : new ArrayList<>());
         return this;
     }
 
-    public JClass addMethod(JMethod method) {
+    public ClassProccessor addMethod(MethodProcessor method) {
         builder.append(LINE_BREAK)
                 .append(method.end())
                 .append(LINE_BREAK);
         return this;
     }
 
-    public JClass addNestedClass(JClass jClass) {
+    public ClassProccessor addNestedClass(ClassProccessor jClass) {
         builder.append(LINE_BREAK);
         builder.append(jClass.end());
         builder.append(LINE_BREAK);
         return this;
     }
 
-    public JClass createSetterForField(String name) {
+    public ClassProccessor createSetterForField(String name) {
         if (!fields.containsKey(name)) {
             throw new IllegalArgumentException("Field not found for setter: " + name);
         }
-        addMethod(new JMethod()
+        addMethod(new MethodProcessor()
                 .defineSignature("public", false, "void")
                 .name("set" + Character.toUpperCase(name.charAt(0)) + name.substring(1))
                 .defineBody(" this." + name + " = " + name + ";"));
         return this;
     }
 
-    public JClass createGetterForField(String name) {
+    public ClassProccessor createGetterForField(String name) {
         if (!fields.containsKey(name)) {
             throw new IllegalArgumentException("Field not found for Getter: " + name);
         }
-        addMethod(new JMethod()
+        addMethod(new MethodProcessor()
                 .defineSignature("public", false, fields.get(name))
                 .name("get" + Character.toUpperCase(name.charAt(0)) + name.substring(1))
                 .defineBody(" return this." + name + ";"));

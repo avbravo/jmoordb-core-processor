@@ -1,9 +1,9 @@
 package com.avbravo.jmoordb.core.processor;
 
 import com.avbravo.jmoordb.core.annotation.Repository;
-import com.avbravo.jmoordb.core.processor.internal.JClass;
-import com.avbravo.jmoordb.core.processor.internal.JMethod;
-import com.avbravo.jmoordb.core.processor.model.FieldInfo;
+import com.avbravo.jmoordb.core.processor.internal.ClassProccessor;
+import com.avbravo.jmoordb.core.processor.internal.MethodProcessor;
+import com.avbravo.jmoordb.core.processor.model.RepositoryFieldInfo;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -76,19 +76,20 @@ public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
         String pkg = getPackageName(element);
 
         //delegate some processing to our FieldInfo class
-        FieldInfo fieldInfo = FieldInfo.get(element);
+//        FieldInfo fieldInfo = FieldInfo.get(element);
+        RepositoryFieldInfo fieldInfo = RepositoryFieldInfo.get(element);
 
         //the target interface name
         String interfaceName = getTypeName(element);
 
-        //using our JClass to delegate most of the string appending there
-        JClass implClass = new JClass();
+        //using our ClassProccessor to delegate most of the string appending there
+        ClassProccessor implClass = new ClassProccessor();
         implClass.definePackage(pkg);
-//        implClass.defineClass("public class ", repository.entity(), interfaceName+"Impl implements " + interfaceName);
+
 /*
 Import
          */
-implClass.addEditorFoldStart("imports");
+        implClass.addEditorFoldStart("imports");
         if (!repository.jakarta()) {
             /*
             Java EE
@@ -124,12 +125,12 @@ implClass.addEditorFoldStart("imports");
         implClass.addImport("java.util.ArrayList");
         implClass.addImport("java.util.List");
         implClass.addImport("java.util.Optional");
-implClass.addEditorFoldEnd();
+        implClass.addEditorFoldEnd();
 
-/**
- * Anotaciones
- */
-implClass.addAnnotations("@ApplicationScoped");
+        /**
+         * Anotaciones
+         */
+        implClass.addAnnotations("@ApplicationScoped");
         /*
         Clase
          */
@@ -145,15 +146,15 @@ implClass.addAnnotations("@ApplicationScoped");
         implClass.addInject("MongoClient mongoClient");
         implClass.addEditorFoldEnd();
 
-        //nested builder class
-        JClass builder = null;
+//        //nested builder class
+        ClassProccessor builder = null;
         String builderClassName = null;
-
-        if (repository.jakarta()) {
-            builder = new JClass();
-            builder.defineClass("public static class",
-                    builderClassName = repository.entity() + "Builder", null);
-        }
+//
+//        if (repository.jakarta()) {
+//            builder = new ClassProccessor();
+//            builder.defineClass("public static class",
+//                    builderClassName = repository.entity() + "Builder", null);
+//        }
 
         //adding class fields
         implClass.addFields(fieldInfo.getFields());
@@ -182,12 +183,12 @@ implClass.addAnnotations("@ApplicationScoped");
             }
 
             if (builder != null && !mandatory) {
-                builder.addMethod(new JMethod()
+                builder.addMethod(new MethodProcessor()
                         .defineSignature("public", false, builderClassName)
                         .name(name)
                         .addParam(type, name)
                         .defineBody(" this." + name + " = " + name + ";"
-                                + JClass.LINE_BREAK
+                                + ClassProccessor.LINE_BREAK
                                 + " return this;"
                         )
                 );
@@ -197,7 +198,7 @@ implClass.addAnnotations("@ApplicationScoped");
         if (builder != null) {
 
             //generate create() method of the Builder class
-            JMethod createMethod = new JMethod()
+            MethodProcessor createMethod = new MethodProcessor()
                     .defineSignature("public", true, builderClassName)
                     .name("create");
 
@@ -216,7 +217,7 @@ implClass.addAnnotations("@ApplicationScoped");
             builder.addMethod(createMethod);
 
             //generate build() method of the builder class.
-            JMethod buildMethod = new JMethod()
+            MethodProcessor buildMethod = new MethodProcessor()
                     .defineSignature("public", false, repository.entity())
                     .name("build");
             StringBuilder buildBody = new StringBuilder();
@@ -224,7 +225,7 @@ implClass.addAnnotations("@ApplicationScoped");
                     .append(" a = new ")
                     .append(repository.entity())
                     .append(paramString)
-                    .append(JClass.LINE_BREAK);
+                    .append(ClassProccessor.LINE_BREAK);
             for (String s : fieldInfo.getFields().keySet()) {
                 if (fieldInfo.getMandatoryFields().contains(s)) {
                     continue;
@@ -234,10 +235,10 @@ implClass.addAnnotations("@ApplicationScoped");
                         .append(" = ")
                         .append(s)
                         .append(";")
-                        .append(JClass.LINE_BREAK);
+                        .append(ClassProccessor.LINE_BREAK);
             }
             buildBody.append("return a;")
-                    .append(JClass.LINE_BREAK);
+                    .append(ClassProccessor.LINE_BREAK);
             buildMethod.defineBody(buildBody.toString());
 
             builder.addMethod(buildMethod);

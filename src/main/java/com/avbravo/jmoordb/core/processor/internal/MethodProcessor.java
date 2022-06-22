@@ -2,17 +2,17 @@ package com.avbravo.jmoordb.core.processor.internal;
 
 import java.util.SortedMap;
 
-public class JMethod {
+public class MethodProcessor {
     private StringBuilder builder = new StringBuilder();
     private boolean firstParam = true;
     private boolean forInterface;
 
-    public JMethod forInterface() {
+    public MethodProcessor forInterface() {
         forInterface = true;
         return this;
     }
 
-    public JMethod defineSignature(String accessModifier, boolean asStatic, String returnType) {
+    public MethodProcessor defineSignature(String accessModifier, boolean asStatic, String returnType) {
         builder.append(forInterface ? "" : accessModifier)
                 .append(asStatic? " static ": " ")
                 .append(returnType)
@@ -20,13 +20,13 @@ public class JMethod {
         return this;
     }
 
-    public JMethod name(String name) {
+    public MethodProcessor name(String name) {
         builder.append(name)
                 .append("(");
         return this;
     }
 
-    public JMethod addParam(String type, String identifier) {
+    public MethodProcessor addParam(String type, String identifier) {
         if (!firstParam) {
             builder.append(", ");
         } else {
@@ -39,16 +39,16 @@ public class JMethod {
         return this;
     }
 
-    public JMethod defineBody(String body) {
+    public MethodProcessor defineBody(String body) {
         if (forInterface) {
             throw new IllegalArgumentException("Interface cannot define a body");
         }
         builder.append(") {")
-                .append(JClass.LINE_BREAK)
+                .append(ClassProccessor.LINE_BREAK)
                 .append(body)
-                .append(JClass.LINE_BREAK)
+                .append(ClassProccessor.LINE_BREAK)
                 .append("}")
-                .append(JClass.LINE_BREAK);
+                .append(ClassProccessor.LINE_BREAK);
         return this;
     }
 
