@@ -42,6 +42,18 @@ public class JClass {
         return this;
     }
 // </editor-fold>
+    // <editor-fold defaultstate="collapsed" desc="JClass addAnnotations(String annotation)">
+/**
+ * 
+ * @param annotation
+ * @return agrega anotaciones
+ */
+    public JClass addAnnotations(String annotation) {
+        builder.append(annotation)
+                .append(LINE_BREAK);
+        return this;
+    }
+// </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="JClass addInject(String injectSentence) ">
 /**
  * 

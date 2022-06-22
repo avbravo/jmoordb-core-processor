@@ -125,8 +125,13 @@ implClass.addEditorFoldStart("imports");
         implClass.addImport("java.util.List");
         implClass.addImport("java.util.Optional");
 implClass.addEditorFoldEnd();
+
+/**
+ * Anotaciones
+ */
+implClass.addAnnotations("@ApplicationScoped");
         /*
-        
+        Clase
          */
         implClass.defineClass("public class ", interfaceName + "Impl", " implements " + interfaceName);
 
