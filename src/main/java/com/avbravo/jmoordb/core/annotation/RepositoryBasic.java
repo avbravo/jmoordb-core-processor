@@ -7,22 +7,20 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Repository {
-
+public @interface RepositoryBasic {
     /**
      * The name of the implementation that will be generated. It should be a
      * valid/unique java qualifier name
-     *
      * @return
      */
-//   String entity();
+   String entity();
+    
+//  Class<?> entity();
 
-    Class<?> entity();
 
     /**
-     * If true a corresponding builder (based on builder design pattern) is also
-     * generated.
-     *
+     * If true a corresponding builder (based on builder design pattern)
+     * is also generated.
      * @return
      */
     boolean jakarta() default false;

@@ -7,7 +7,7 @@ https://cloudogu.com/en/blog/Java-Annotation-Processors_1-Intro
 
 https://github.com/cloudogu/annotation-processors/tree/master/part-3
 
-
+```
 package com.cloudogu.blog;
 
 import org.junit.Test;
@@ -24,3 +24,4 @@ public class PersonTest {
     }
 
 }
+```
