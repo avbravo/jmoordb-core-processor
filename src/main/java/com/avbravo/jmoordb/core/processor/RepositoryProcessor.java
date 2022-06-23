@@ -1,8 +1,8 @@
 package com.avbravo.jmoordb.core.processor;
 
 import com.avbravo.jmoordb.core.annotation.Repository;
-import com.avbravo.jmoordb.core.processor.internal.ClassProccessor;
-import com.avbravo.jmoordb.core.processor.internal.MethodProcessor;
+import com.avbravo.jmoordb.core.processor.internal.ClassProccessorAux;
+import com.avbravo.jmoordb.core.processor.internal.MethodProcessorAux;
 import com.avbravo.jmoordb.core.processor.model.RepositoryFieldInfo;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -25,7 +25,7 @@ import java.util.*;
 @SupportedAnnotationTypes(
         {"com.avbravo.jmoordb.core.annotation.Repository"})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
-public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
+public class RepositoryProcessor extends AbstractProcessor {
 
     // <editor-fold defaultstate="collapsed" desc=" boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)">
     @Override
@@ -53,10 +53,10 @@ public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
                     error = true;
                 }
 
-                error = !checkIdValidity(repository.entity().getName(), element);
+                error = !checkIdValidity(repository.entity(), element);
 
                 if (!error) {
-                    uniqueIdCheckList.add(repository.entity().getName());
+                    uniqueIdCheckList.add(repository.entity());
                     try {
                         generateClass(repository, element);
                     } catch (Exception e) {
@@ -83,7 +83,7 @@ public class RepositoryAutoGenerateProcessor extends AbstractProcessor {
         String interfaceName = getTypeName(element);
 
         //using our ClassProccessor to delegate most of the string appending there
-        ClassProccessor implClass = new ClassProccessor();
+        ClassProccessorAux implClass = new ClassProccessorAux();
         implClass.definePackage(pkg);
 
 /*
@@ -147,7 +147,7 @@ Import
         implClass.addEditorFoldEnd();
 
 //        //nested builder class
-        ClassProccessor builder = null;
+        ClassProccessorAux builder = null;
         String builderClassName = null;
 //
 //        if (repository.jakarta()) {
@@ -183,12 +183,12 @@ Import
             }
 
             if (builder != null && !mandatory) {
-                builder.addMethod(new MethodProcessor()
+                builder.addMethod(new MethodProcessorAux()
                         .defineSignature("public", false, builderClassName)
                         .name(name)
                         .addParam(type, name)
                         .defineBody(" this." + name + " = " + name + ";"
-                                + ClassProccessor.LINE_BREAK
+                                + ClassProccessorAux.LINE_BREAK
                                 + " return this;"
                         )
                 );
@@ -198,7 +198,7 @@ Import
         if (builder != null) {
 
             //generate create() method of the Builder class
-            MethodProcessor createMethod = new MethodProcessor()
+            MethodProcessorAux createMethod = new MethodProcessorAux()
                     .defineSignature("public", true, builderClassName)
                     .name("create");
 
@@ -217,15 +217,15 @@ Import
             builder.addMethod(createMethod);
 
             //generate build() method of the builder class.
-            MethodProcessor buildMethod = new MethodProcessor()
-                    .defineSignature("public", false, repository.entity().getName())
+            MethodProcessorAux buildMethod = new MethodProcessorAux()
+                    .defineSignature("public", false, repository.entity())
                     .name("build");
             StringBuilder buildBody = new StringBuilder();
             buildBody.append(repository.entity())
                     .append(" a = new ")
                     .append(repository.entity())
                     .append(paramString)
-                    .append(ClassProccessor.LINE_BREAK);
+                    .append(ClassProccessorAux.LINE_BREAK);
             for (String s : fieldInfo.getFields().keySet()) {
                 if (fieldInfo.getMandatoryFields().contains(s)) {
                     continue;
@@ -235,10 +235,10 @@ Import
                         .append(" = ")
                         .append(s)
                         .append(";")
-                        .append(ClassProccessor.LINE_BREAK);
+                        .append(ClassProccessorAux.LINE_BREAK);
             }
             buildBody.append("return a;")
-                    .append(ClassProccessor.LINE_BREAK);
+                    .append(ClassProccessorAux.LINE_BREAK);
             buildMethod.defineBody(buildBody.toString());
 
             builder.addMethod(buildMethod);

@@ -1,7 +1,7 @@
 package com.avbravo.jmoordb.core.processor;
 
-import com.avbravo.jmoordb.core.processor.internal.ClassProccessor;
-import com.avbravo.jmoordb.core.processor.internal.MethodProcessor;
+import com.avbravo.jmoordb.core.processor.internal.ClassProccessorAux;
+import com.avbravo.jmoordb.core.processor.internal.MethodProcessorAux;
 import com.avbravo.jmoordb.core.processor.model.FieldInfo;
 import com.avbravo.jmoordb.core.annotation.AutoImplement;
 
@@ -80,16 +80,16 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         String interfaceName = getTypeName(element);
 
         //using our JClass to delegate most of the string appending there
-        ClassProccessor implClass = new ClassProccessor();
+        ClassProccessorAux implClass = new ClassProccessorAux();
         implClass.definePackage(pkg);
         implClass.defineClass("public class ", autoImplement.as(), "implements " + interfaceName);
 
         //nested builder class
-        ClassProccessor builder = null;
+        ClassProccessorAux builder = null;
         String builderClassName = null;
 
         if (autoImplement.builder()) {
-            builder = new ClassProccessor();
+            builder = new ClassProccessorAux();
             builder.defineClass("public static class",
                     builderClassName = autoImplement.as() + "Builder", null);
         }
@@ -121,12 +121,12 @@ public class AutoGenerateProcessor extends AbstractProcessor {
             }
 
             if (builder != null && !mandatory) {
-                builder.addMethod(new MethodProcessor()
+                builder.addMethod(new MethodProcessorAux()
                         .defineSignature("public", false, builderClassName)
                         .name(name)
                         .addParam(type, name)
                         .defineBody(" this." + name + " = " + name + ";"
-                                + ClassProccessor.LINE_BREAK
+                                + ClassProccessorAux.LINE_BREAK
                                 + " return this;"
                         )
                 );
@@ -136,7 +136,7 @@ public class AutoGenerateProcessor extends AbstractProcessor {
         if (builder != null) {
 
             //generate create() method of the Builder class
-            MethodProcessor createMethod = new MethodProcessor()
+            MethodProcessorAux createMethod = new MethodProcessorAux()
                     .defineSignature("public", true, builderClassName)
                     .name("create");
 
@@ -156,7 +156,7 @@ public class AutoGenerateProcessor extends AbstractProcessor {
             builder.addMethod(createMethod);
 
             //generate build() method of the builder class.
-            MethodProcessor buildMethod = new MethodProcessor()
+            MethodProcessorAux buildMethod = new MethodProcessorAux()
                     .defineSignature("public", false, autoImplement.as())
                     .name("build");
             StringBuilder buildBody = new StringBuilder();
@@ -164,7 +164,7 @@ public class AutoGenerateProcessor extends AbstractProcessor {
                     .append(" a = new ")
                     .append(autoImplement.as())
                     .append(paramString)
-                    .append(ClassProccessor.LINE_BREAK);
+                    .append(ClassProccessorAux.LINE_BREAK);
             for (String s : fieldInfo.getFields().keySet()) {
                 if (fieldInfo.getMandatoryFields().contains(s)) {
                     continue;
@@ -174,10 +174,10 @@ public class AutoGenerateProcessor extends AbstractProcessor {
                         .append(" = ")
                         .append(s)
                         .append(";")
-                        .append(ClassProccessor.LINE_BREAK);
+                        .append(ClassProccessorAux.LINE_BREAK);
             }
             buildBody.append("return a;")
-                    .append(ClassProccessor.LINE_BREAK);
+                    .append(ClassProccessorAux.LINE_BREAK);
             buildMethod.defineBody(buildBody.toString());
 
             builder.addMethod(buildMethod);

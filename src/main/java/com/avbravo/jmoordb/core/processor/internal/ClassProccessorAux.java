@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * This class only works if we add elements in proper sequence.
  */
-public class ClassProccessor {
+public class ClassProccessorAux {
 
     public static final String LINE_BREAK = System.getProperty("line.separator");
     public static String TAB="   ";
@@ -14,7 +14,7 @@ public class ClassProccessor {
     private String className;
     private Map<String, String> fields = new LinkedHashMap<>();
 
-    public ClassProccessor() {
+    public ClassProccessorAux() {
 
     }
 
@@ -24,7 +24,7 @@ public class ClassProccessor {
  * @param packageName
  * @return inserta en package en la clase
  */
-    public ClassProccessor definePackage(String packageName) {
+    public ClassProccessorAux definePackage(String packageName) {
         if (packageName != null) {
             builder.append("package ")
                     .append(packageName)
@@ -41,7 +41,7 @@ public class ClassProccessor {
  * @param importPackage
  * @return 
  */
-    public ClassProccessor addImport(String importPackage) {
+    public ClassProccessorAux addImport(String importPackage) {
         builder.append("import ")
                 .append(importPackage)
                 .append(";")
@@ -55,7 +55,7 @@ public class ClassProccessor {
  * @param annotation
  * @return agrega anotaciones
  */
-    public ClassProccessor addAnnotations(String annotation) {
+    public ClassProccessorAux addAnnotations(String annotation) {
         builder.append(annotation)
                 .append(LINE_BREAK);
         return this;
@@ -67,7 +67,7 @@ public class ClassProccessor {
  * @param injectSentence
  * @return 
  */
-    public ClassProccessor addInject(String injectSentence) {
+    public ClassProccessorAux addInject(String injectSentence) {
         builder.append(TAB+"@Inject ")
                 .append(LINE_BREAK)
                 .append(TAB+injectSentence)
@@ -82,7 +82,7 @@ public class ClassProccessor {
  * @param comment
  * @return inserta comentarios
  */
-    public ClassProccessor addComment(String comment) {
+    public ClassProccessorAux addComment(String comment) {
         builder.append("/*")
                 .append(LINE_BREAK)
                 .append(TAB+comment)
@@ -99,7 +99,7 @@ public class ClassProccessor {
  * @param desc. -Utiloce \" si necesita incluir " en el texto
  * @return inserta un editor fold que sirve como ayuda a NetBeans IDE
  */
-    public ClassProccessor addEditorFoldStart(String desc) {
+    public ClassProccessorAux addEditorFoldStart(String desc) {
         builder.append("// <editor-fold defaultstate=\"collapsed\" desc=\"")
                 .append(desc)
                 .append("\">")                
@@ -113,7 +113,7 @@ public class ClassProccessor {
  * @param desc
  * @return cierra un editor fold que sirve como ayuda a NetBeans IDE
  */
-    public ClassProccessor addEditorFoldEnd() {
+    public ClassProccessorAux addEditorFoldEnd() {
         builder.append("// </editor-fold>")                    
                 .append(LINE_BREAK);
         return this;
@@ -128,7 +128,7 @@ public class ClassProccessor {
  * @param injectSentence
  * @return 
  */
-    public ClassProccessor addInjectConfigProperties(String  nameConfigProperty, String javatype, String javaNameVariable) {
+    public ClassProccessorAux addInjectConfigProperties(String  nameConfigProperty, String javatype, String javaNameVariable) {
         builder.append(TAB+"@Inject ")
                 .append(LINE_BREAK)
                 .append(TAB+"@ConfigProperty(name = \""+nameConfigProperty +"\")")
@@ -149,7 +149,7 @@ public class ClassProccessor {
  * @return 
  */
     
-    public ClassProccessor defineClass(String startPart, String name, String extendPart) {
+    public ClassProccessorAux defineClass(String startPart, String name, String extendPart) {
         className = name;
         builder.append(LINE_BREAK).append(LINE_BREAK)
                 .append(startPart)
@@ -172,7 +172,7 @@ public class ClassProccessor {
  * @param identifierToTypeMap
  * @return 
  */
-    public ClassProccessor addFields(LinkedHashMap<String, String> identifierToTypeMap) {
+    public ClassProccessorAux addFields(LinkedHashMap<String, String> identifierToTypeMap) {
         for (Map.Entry<String, String> entry : identifierToTypeMap.entrySet()) {
             addField(entry.getValue(), entry.getKey());
         }
@@ -182,7 +182,7 @@ public class ClassProccessor {
     
     // <editor-fold defaultstate="collapsed" desc="JClass addField(String type, String identifier)">
 
-    public ClassProccessor addField(String type, String identifier) {
+    public ClassProccessorAux addField(String type, String identifier) {
         fields.put(identifier, type);
         builder.append("private ")
                 .append(type)
@@ -202,7 +202,7 @@ public class ClassProccessor {
  * @param fieldsToBind
  * @return 
  */
-    public ClassProccessor addConstructor(String accessModifier, List<String> fieldsToBind) {
+    public ClassProccessorAux addConstructor(String accessModifier, List<String> fieldsToBind) {
         builder.append(LINE_BREAK)
                 .append(accessModifier)
                 .append(" ")
@@ -237,43 +237,43 @@ public class ClassProccessor {
 
     }
 // </editor-fold>
-    public ClassProccessor addConstructor(String accessModifier, boolean bindFields) {
+    public ClassProccessorAux addConstructor(String accessModifier, boolean bindFields) {
         addConstructor(accessModifier,
                 bindFields ? new ArrayList(fields.keySet())
                         : new ArrayList<>());
         return this;
     }
 
-    public ClassProccessor addMethod(MethodProcessor method) {
+    public ClassProccessorAux addMethod(MethodProcessorAux method) {
         builder.append(LINE_BREAK)
                 .append(method.end())
                 .append(LINE_BREAK);
         return this;
     }
 
-    public ClassProccessor addNestedClass(ClassProccessor jClass) {
+    public ClassProccessorAux addNestedClass(ClassProccessorAux jClass) {
         builder.append(LINE_BREAK);
         builder.append(jClass.end());
         builder.append(LINE_BREAK);
         return this;
     }
 
-    public ClassProccessor createSetterForField(String name) {
+    public ClassProccessorAux createSetterForField(String name) {
         if (!fields.containsKey(name)) {
             throw new IllegalArgumentException("Field not found for setter: " + name);
         }
-        addMethod(new MethodProcessor()
+        addMethod(new MethodProcessorAux()
                 .defineSignature("public", false, "void")
                 .name("set" + Character.toUpperCase(name.charAt(0)) + name.substring(1))
                 .defineBody(" this." + name + " = " + name + ";"));
         return this;
     }
 
-    public ClassProccessor createGetterForField(String name) {
+    public ClassProccessorAux createGetterForField(String name) {
         if (!fields.containsKey(name)) {
             throw new IllegalArgumentException("Field not found for Getter: " + name);
         }
-        addMethod(new MethodProcessor()
+        addMethod(new MethodProcessorAux()
                 .defineSignature("public", false, fields.get(name))
                 .name("get" + Character.toUpperCase(name.charAt(0)) + name.substring(1))
                 .defineBody(" return this." + name + ";"));
