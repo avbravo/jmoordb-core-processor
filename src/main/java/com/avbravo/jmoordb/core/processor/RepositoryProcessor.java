@@ -34,7 +34,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
-            testMsg("--------------------[Repository.process annotations ="+annotations+"]--------------", true);
+            testMsg("--------------------[Repository.process annotations =" + annotations + "]--------------", true);
             if (annotations.size() == 0) {
                 return false;
             }
@@ -45,14 +45,12 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             for (Element element : elements) {
                 Repository repository = element.getAnnotation(Repository.class);
-                testMsg("{ for Element element : elements}",false);
+                testMsg("{ for Element element : elements}", false);
                 /**
                  * Analizo el tipo Objett
                  */
-//Class<?> clazz = repository.entity();
-//String qualifiedSuperClassName = clazz.getCanonicalName();
-//     String simpleTypeName = clazz.getSimpleName();
 
+                
                 TypeMirror type = mirror(repository::entity);
                 if (type == null) {
                     testMsg(">>>>>>>>>>> type== null", false);
@@ -95,7 +93,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
 //                    error = !checkIdValidity(repository.entity().getName(), element);
                     error = !checkIdValidity(nameOfEntity, element);
-                    testMsg("|>>>>>>>>>>>paso 3 error= "+error, false);
+                    testMsg("|>>>>>>>>>>>paso 3 error= " + error, false);
                     if (!error) {
                         testMsg(">>>>>>>>>>>paso 4", false);
 //                        uniqueIdCheckList.add(repository.entity().getName());
@@ -141,7 +139,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             //using our ClassProccessor to delegate most of the string appending there
             ClassProccessorAux implClass = new ClassProccessorAux();
             implClass.definePackage(pkg);
-testMsg("imports",false);
+            testMsg("imports", false);
             /*
 Import
              */
@@ -250,7 +248,7 @@ Import
                     );
                 }
             }
-testMsg("if (builder != null)",false);
+            testMsg("if (builder != null)", false);
             if (builder != null) {
 
                 //generate create() method of the Builder class
@@ -273,8 +271,7 @@ testMsg("if (builder != null)",false);
                 builder.addMethod(createMethod);
 
                 //generate build() method of the builder class.
-                
-                testMsg("MethodProcessorAux buildMethod = new MethodProcessorAux()",false);
+                testMsg("MethodProcessorAux buildMethod = new MethodProcessorAux()", false);
                 MethodProcessorAux buildMethod = new MethodProcessorAux()
                         .defineSignature("public", false, repository.entity().getName())
                         .name("build");
@@ -305,7 +302,7 @@ testMsg("if (builder != null)",false);
             }
             //finally generate class via Filer
 //        generateClass(pkg + "." + repository.entity(), implClass.end());
-  testMsg("generateClass(pkg + \".\" + interfaceName + \"Impl\", implClass.end())",false);
+            testMsg("generateClass(pkg + \".\" + interfaceName + \"Impl\", implClass.end())", false);
             generateClass(pkg + "." + interfaceName + "Impl", implClass.end());
         } catch (Exception e) {
             System.out.println("Repository.generateClass() " + e.getLocalizedMessage());
@@ -329,12 +326,12 @@ testMsg("if (builder != null)",false);
     private void generateClass(String qfn, String end) throws IOException {
         try {
 
-            testMsg("RepositoryBasicProcessor.generateClass(String qfn , String end) =  "+qfn+ " "+end, true);
+            testMsg("RepositoryBasicProcessor.generateClass(String qfn , String end) =  " + qfn + " " + end, true);
             JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(qfn);
             Writer writer = sourceFile.openWriter();
             writer.write(end);
             writer.close();
-            testMsg("writer.close.()",false);
+            testMsg("writer.close.()", false);
         } catch (Exception e) {
             System.out.println("Repository.generateClass() " + e.getLocalizedMessage());
         }
@@ -369,7 +366,7 @@ testMsg("if (builder != null)",false);
         } catch (Exception ex) {
             System.out.println("Repository.checkIdValidity() " + ex.getLocalizedMessage());
         }
-        testMsg("valid = "+valid,false);
+        testMsg("valid = " + valid, false);
         return valid;
     }
 // </editor-fold>

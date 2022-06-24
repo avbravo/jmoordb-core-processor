@@ -51,3 +51,25 @@ Class<?> clazz = annotation.type();
 
 Otavio Santana
 https://dzone.com/articles/introduction-to-reflectionless-know-what-the-new-t
+
+
+Creacion y lectura de clases Class.forName()
+https://www.tabnine.com/code/java/methods/java.lang.Class/forName
+
+
+ public static void main(String[] args)
+        throws ClassNotFoundException
+    {
+ 
+        // returns the Class object for this class
+        Class myClass = Class.forName("Test");
+ 
+        System.out.println("Class represented by myClass: "
+                           + myClass.toString());
+ 
+        // Get the fields of myClass
+        // using getFields() method
+        System.out.println("Fields of myClass: "
+                           + Arrays.toString(
+                                 myClass.getFields()));
+    }
