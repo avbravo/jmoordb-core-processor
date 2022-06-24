@@ -25,3 +25,29 @@ public class PersonTest {
 
 }
 ```
+
+
+Vaidaciones
+https://hannesdorfmann.com/annotation-processing/annotationprocessing101/
+Class<?> clazz = annotation.type();
+      qualifiedSuperClassName = clazz.getCanonicalName();
+      simpleTypeName = clazz.getSimpleName();
+
+
+@Override
+
+    public <T> Map<String, Object> toMap(T entity) {
+
+        Objects.requireNonNull(entity, "entity is required");
+
+        Map<String, Object> map = new HashMap<>();
+
+        final Class<?> type = entity.getClass();
+
+        final Entity annotation = Optional.ofNullable(
+                type.getAnnotation(Entity.class))
+
+                .orElseThrow(() -> new RuntimeException("The class must have Entity annotation"));
+
+Otavio Santana
+https://dzone.com/articles/introduction-to-reflectionless-know-what-the-new-t

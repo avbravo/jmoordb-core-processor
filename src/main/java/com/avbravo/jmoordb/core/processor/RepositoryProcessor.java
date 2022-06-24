@@ -48,6 +48,10 @@ public class RepositoryProcessor extends AbstractProcessor {
 /**
  * Analizo el tipo Objett
  */
+Class<?> clazz = repository.entity();
+String qualifiedSuperClassName = clazz.getCanonicalName();
+     String simpleTypeName = clazz.getSimpleName();
+     
                 TypeMirror type = mirror(repository::entity);
                 if (type == null) {
                     System.out.println(">>>>>>>>>>> type== null");

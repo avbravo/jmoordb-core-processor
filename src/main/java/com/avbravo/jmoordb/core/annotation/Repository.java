@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Repository {
 
     /**
@@ -17,7 +17,7 @@ public @interface Repository {
      */
 //   String entity();
 
-    Class entity();
+    Class<?> entity();
 
     /**
      * If true a corresponding builder (based on builder design pattern) is also

@@ -49,7 +49,7 @@ public class RepositoryBasicProcessor extends AbstractProcessor {
                 boolean error = false;
 
                 if (uniqueIdCheckList.contains(repository.entity())) {
-                    error("Repository #as should be uniquely defined", element);
+                    error("RepositoryBasic has should be uniquely defined", element);
                     error = true;
                 }
 
