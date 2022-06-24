@@ -47,6 +47,23 @@ public class Util {
     public static String nameOfFileInPath(String filenamePath) {
         String name = "";
         try {
+            name =filenamePath.substring(filenamePath.lastIndexOf('.')+1,filenamePath.length());
+        } catch (Exception e) {
+            System.out.println(nameOfMethod() + " " + e.getLocalizedMessage());
+        }
+        return name;
+    }
+
+    // </editor-fold>
+    // <editor-fold defaultstate="collapsed" desc="String packageOfFileInPath(String filenamePath)">
+    /**
+     *
+     * @param filenamePath
+     * @return el paquete del path pasado
+     */
+    public static String packageOfFileInPath(String filenamePath) {
+        String name = "";
+        try {
             name = filenamePath.substring(filenamePath.lastIndexOf(System.getProperty("file.separator")) + 1,
                     filenamePath.lastIndexOf('.'));
         } catch (Exception e) {

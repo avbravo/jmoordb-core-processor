@@ -30,6 +30,7 @@ public class RepositoryBasicProcessor extends AbstractProcessor {
     // <editor-fold defaultstate="collapsed" desc=" boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv)">
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        
         if (annotations.size() == 0) {
             return false;
         }
@@ -265,6 +266,8 @@ Import
 
     // <editor-fold defaultstate="collapsed" desc="generateClass(String qfn, String end)">
     private void generateClass(String qfn, String end) throws IOException {
+        
+                  
         JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(qfn);
         Writer writer = sourceFile.openWriter();
         writer.write(end);
@@ -310,4 +313,6 @@ Import
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, e);
     }
     // </editor-fold>
+    
+    
 }
