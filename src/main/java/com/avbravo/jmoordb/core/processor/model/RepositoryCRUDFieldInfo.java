@@ -74,39 +74,24 @@ public class RepositoryCRUDFieldInfo {
      * @return
      */
     private static String methodToFieldName(String methodName) {
-        if (methodName.startsWith("get")) {
-            String str = methodName.substring(3);
-            if (str.length() == 0) {
-                return null;
-            } else if (str.length() == 1) {
-                return str.toLowerCase();
-            } else {
-                return Character.toLowerCase(str.charAt(0)) + str.substring(1);
-            }
-        } else {
+      
 
-        }
+      
         if (methodName.startsWith("find")) {
             String str = methodName.substring(4);
-            if (str.length() == 0) {
-                return null;
-            } else if (str.length() == 1) {
-                return str.toLowerCase();
-            } else {
-                return Character.toLowerCase(str.charAt(0)) + str.substring(1);
-            }
-        } else {
-            if (methodName.startsWith("delete")) {
-                String str = methodName.substring(6);
-                if (str.length() == 0) {
-                    return null;
-                } else if (str.length() == 1) {
-                    return str.toLowerCase();
-                } else {
-                    return Character.toLowerCase(str.charAt(0)) + str.substring(1);
-                }
-            }
+//            if (str.length() == 0) {
+//                return null;
+//            } else if (str.length() == 1) {
+//                return str.toLowerCase();
+//            } else {
+//                return Character.toLowerCase(str.charAt(0)) + str.substring(1);
+                return methodName;
+            }else{
+            
         }
+       
+           
+
         return null;
     }
 
