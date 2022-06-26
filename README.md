@@ -171,3 +171,131 @@ NONGODB VIEWS
 
 https://www.mongodb.com/docs/manual/core/views/
 
+
+
+# VISTAS JOINS DE TRES TABLAS
+# $lockup
+Java Driver
+https://mongodb.github.io/mongo-java-driver/3.2/builders/aggregation/
+
+Agregation en Jmoordb
+https://avbravo-2.gitbook.io/jmoordb/capitulo-7-aggregation/capitulo-6-aggregation
+
+```
+{
+$lookup:
+{
+From:<join collections>,
+localField: <input documents’ field>,
+foreignField:<documents’ field of the ‘from’ collection>,
+as: <result array field>
+}
+}
+```
+
+Referencia:
+https://stackoverflow.com/questions/35813854/how-to-join-multiple-collections-with-lookup-in-mongodb
+
+Objectivo:
+  Relacionar sivaUser, sivaUserInfo, sivaUserRole
+
+$lookup
+
+## Insert datos en coleccion
+```
+db.sivaUser.insertMany( [
+       { 
+       "email" : "admin@gmail.com",
+       "userId" : "AD",
+       "userName" : "admin"
+       },
+       {
+        "email" : "avbravo@gmail.com",
+        "userId" : "AVBRAVO",
+        "userName" : "aris"
+        }
+       ] )
+
+
+
+
+//"userinfo"
+db.sivaUserInfo.insert([
+        {
+         "userId" : "AD",
+         "phone" : "0000000000"
+        },
+        {
+        "userId" : "AVBRAVO",
+        "phone" : "65277389"
+        }
+])
+
+
+//"userrole"
+db.sivaUserRole.insert([
+        {
+
+            "userId" : "AD",
+            "role" : "admin"
+        },
+        {
+            "userId" : "AVBRAVO",
+            "role" : "testing"
+        }
+])
+
+```
+
+
+## Crear el agregate
+### Con el match aplicamos el where
+### Lookup hacemos el join
+
+```
+db.sivaUserInfo.aggregate([
+    { "$match": { "userId": "AVBRAVO" }},
+    {
+        $lookup: {
+           from: "sivaUserRole",
+           localField: "userId",
+           foreignField: "userId",
+           as: "userRole"
+        }
+    },
+    {
+        $unwind: "$userRole"
+    },
+    {
+        $lookup: {
+            from: "sivaUserInfo",
+            localField: "userId",
+            foreignField: "userId",
+            as: "userInfo"
+        }
+    },
+    {
+        $unwind: "$userInfo"
+    }
+])
+
+```
+
+## Resultado
+```
+{
+	"_id" : ObjectId("56d82612b63f1c31cf906003"),
+	"userId" : "AD",
+	"phone" : "0000000000",
+	"userRole" : {
+		"_id" : ObjectId("56d82612b63f1c31cf906003"),
+		"userId" : "AD",
+		"role" : "admin"
+	},
+	"userInfo" : {
+		"_id" : ObjectId("56d82612b63f1c31cf906003"),
+		"userId" : "AD",
+		"phone" : "0000000000"
+	}
+}
+```
