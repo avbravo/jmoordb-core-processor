@@ -8,14 +8,15 @@
 
 ## Generar vistas para las referenciac mediante $lookup
 
----------------------------------------------
+
 ### Tablas referenciadas @Referenced
-----------------------------------------------
+
+```
 Persona{
 idpersona:1, name:"aris"}
 
 Visitante { idvisitante:1, persona:{idpersona:1}}
-
+```
 
 Person.java
 ```
@@ -215,11 +216,10 @@ db.sivaUser.insertMany( [
         "userName" : "aris"
         }
        ] )
+```
 
-
-
-
-//"userinfo"
+### "userinfo"
+```
 db.sivaUserInfo.insert([
         {
          "userId" : "AD",
@@ -230,12 +230,12 @@ db.sivaUserInfo.insert([
         "phone" : "65277389"
         }
 ])
+```
 
-
-//"userrole"
+### "userrole"
+```
 db.sivaUserRole.insert([
         {
-
             "userId" : "AD",
             "role" : "admin"
         },
@@ -244,7 +244,6 @@ db.sivaUserRole.insert([
             "role" : "testing"
         }
 ])
-
 ```
 
 
@@ -278,7 +277,6 @@ db.sivaUserInfo.aggregate([
         $unwind: "$userInfo"
     }
 ])
-
 ```
 
 ## Resultado
@@ -299,3 +297,5 @@ db.sivaUserInfo.aggregate([
 	}
 }
 ```
+
+
