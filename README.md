@@ -252,7 +252,7 @@ db.sivaUserRole.insert([
 ### Lookup hacemos el join
 
 ```
-db.sivaUserInfo.aggregate([
+db.sivaUser.aggregate([
     { "$match": { "userId": "AVBRAVO" }},
     {
         $lookup: {
