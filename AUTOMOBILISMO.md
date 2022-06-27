@@ -1,6 +1,10 @@
 
 # Proyectos de Referencia
+Usar mongodb java driver lookup $unwind: para obtener un solo registro de una agregacion
+Agregarlo al codigo java para casos de una sola coleccion
 
+
+https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/
 
 ## Clases
 ## Auto.java
