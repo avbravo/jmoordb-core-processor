@@ -1,5 +1,13 @@
 
 # Proyectos de Referencia
+```
+@Repository
+public interface Country{
+
+@Query(value="select * from")
+public List<Country> findAll();
+}
+```
 
 
 # Tareas
@@ -299,3 +307,7 @@ db.sivaUser.aggregate([
 ```
 
 
+
+
+LEE ANOTACIONES
+https://github.com/MorphiaOrg/morphia/blob/master/core/src/main/java/dev/morphia/mapping/codec/pojo/EntityModel.java
