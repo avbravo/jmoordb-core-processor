@@ -1,5 +1,15 @@
 
 # Proyectos de Referencia
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+
 ```
 @Repository
 public interface Country{
