@@ -25,7 +25,7 @@ import java.util.*;
 @SupportedAnnotationTypes(
         {"com.avbravo.jmoordb.core.annotation.AutoImplement"})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
-public class AutoGenerateProcessor extends AbstractProcessor {
+public class AutoImplementProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
