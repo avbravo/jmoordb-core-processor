@@ -33,8 +33,8 @@ db.pais.aggregate(
 { 
   $lookup:{
             from:"oceano",
-            localField:"oceano$.idoceano",
-            foreignField:"idceano",
+            localField:"oceano.idoceano",
+            foreignField:"idoceano",
             as:"oceano"
             }
   }
