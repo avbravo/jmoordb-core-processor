@@ -41,3 +41,21 @@ db.pais.aggregate(
 
 ]
 ).pretty()
+
+
+## Provincia -->pais
+
+db.pais.aggregate(
+[
+  
+   {
+    $lookup:{
+            from:"pais",
+            localField:"pais.idpais",
+            foreignField:"idpais",
+            as:"pais"
+            }
+    }
+
+]
+).pretty()
