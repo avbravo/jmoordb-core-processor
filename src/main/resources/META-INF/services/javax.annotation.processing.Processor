@@ -1,4 +1,4 @@
-com.avbravo.jmoordb.core.processor.AutoGenerateProcessor
+com.avbravo.jmoordb.core.processor.AutoImplementProcessor 
 com.avbravo.jmoordb.core.processor.RepositoryBasicProcessor
 com.avbravo.jmoordb.core.processor.RepositoryProcessor
 com.avbravo.jmoordb.core.processor.RepositoryCRUDProcessor
