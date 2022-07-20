@@ -1,5 +1,6 @@
 package com.avbravo.jmoordb.core.annotation;
 
+import com.avbravo.jmoordb.core.annotation.enumerations.TypeReferenced;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,4 +27,5 @@ public @interface Repository {
      * @return
      */
     boolean jakarta() default false;
+
 }

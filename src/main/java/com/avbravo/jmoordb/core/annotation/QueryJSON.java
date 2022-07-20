@@ -17,8 +17,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Query {
-  String  where() default "";
+public @interface QueryJSON {
   ActivatePagination activatePagination() default ActivatePagination.ON ;
-  ActivateSort activateSort() default ActivateSort.OFF ;
+  ActivateSort activateSort() default ActivateSort.ON ;
 }

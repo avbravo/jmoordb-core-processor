@@ -4,8 +4,6 @@
  */
 package com.avbravo.jmoordb.core.annotation;
 
-import com.avbravo.jmoordb.core.annotation.enumerations.ActivatePagination;
-import com.avbravo.jmoordb.core.annotation.enumerations.ActivateSort;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,8 +15,6 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Query {
-  String  where() default "";
-  ActivatePagination activatePagination() default ActivatePagination.ON ;
-  ActivateSort activateSort() default ActivateSort.OFF ;
+public @interface Count {
+ 
 }
