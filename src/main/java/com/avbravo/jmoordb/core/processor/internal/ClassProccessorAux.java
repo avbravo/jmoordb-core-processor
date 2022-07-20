@@ -1,5 +1,7 @@
 package com.avbravo.jmoordb.core.processor.internal;
 
+import com.avbravo.jmoordb.core.annotation.Repository;
+import com.avbravo.jmoordb.core.util.Test;
 import java.util.*;
 
 /**
@@ -251,12 +253,16 @@ public class ClassProccessorAux {
         return this;
     }
 
+    // <editor-fold defaultstate="collapsed" desc="ClassProccessorAux addNestedClass(ClassProccessorAux jClass)">
+
     public ClassProccessorAux addNestedClass(ClassProccessorAux jClass) {
         builder.append(LINE_BREAK);
         builder.append(jClass.end());
         builder.append(LINE_BREAK);
         return this;
     }
+// </editor-fold>
+    // <editor-fold defaultstate="collapsed" desc="ClassProccessorAux createSetterForField(String name)">
 
     public ClassProccessorAux createSetterForField(String name) {
         if (!fields.containsKey(name)) {
@@ -268,7 +274,9 @@ public class ClassProccessorAux {
                 .defineBody(" this." + name + " = " + name + ";"));
         return this;
     }
-
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="ClassProccessorAux createGetterForField(String name)">
+   
     public ClassProccessorAux createGetterForField(String name) {
         if (!fields.containsKey(name)) {
             throw new IllegalArgumentException("Field not found for Getter: " + name);
@@ -279,6 +287,7 @@ public class ClassProccessorAux {
                 .defineBody(" return this." + name + ";"));
         return this;
     }
+    // </editor-fold> 
 // <editor-fold defaultstate="collapsed" desc="end()">
 
     /**
@@ -291,4 +300,61 @@ public class ClassProccessorAux {
 
     }
     // </editor-fold>
+    
+    
+    
+    // <editor-fold defaultstate="collapsed" desc="ClassProccessorAux generateImport(ClassProccessorAux classProccessorAux ,Repository repository)">
+    
+    /**
+     * 
+     * @param classProccessorAux
+     * @param repository
+     * @return  Genera los imports para el Repository
+     */
+    public ClassProccessorAux generateImport(Repository repository){
+        
+        try {
+             if (!repository.jakarta()) {
+                /*
+            Java EE
+                 */
+                addImport("javax.enterprise.context.ApplicationScoped");
+                addImport("javax.inject.Inject");
+                addImport("javax.json.bind.Jsonb");
+                addImport("javax.json.bind.JsonbBuilder");
+            } else {
+                /**
+                 * Jakarta EE
+                 */
+                addImport("jakarta.enterprise.context.ApplicationScoped");
+                addImport("jakarta.inject.Inject");
+                addImport("jakarta.json.bind.Jsonb");
+                addImport("jakarta.json.bind.JsonbBuilder");
+
+            }
+            /**
+             * Microprofile
+             */
+            addImport("org.eclipse.microprofile.config.Config");
+            addImport("org.eclipse.microprofile.config.inject.ConfigProperty");
+            /**
+             * MongoDB
+             */
+            addImport("com.mongodb.client.MongoDatabase;");
+            addImport("static com.mongodb.client.model.Filters.eq");
+            addImport("com.mongodb.client.MongoClient");
+            addImport("com.mongodb.client.MongoCollection");
+            addImport("com.mongodb.client.MongoCursor");
+
+            addImport("java.util.ArrayList");
+            addImport("java.util.List");
+            addImport("java.util.Optional");
+        } catch (Exception e) {
+            Test.error(Test.nameOfClassAndMethod()+  " "+e.getLocalizedMessage());
+        }
+        return this;
+    }
+    
+// </editor-fold>
+    
 }

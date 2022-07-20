@@ -34,7 +34,7 @@ public class RepositoryCRUDProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
-            testMsg("--------------------[RepositoryCRUD.process annotations =" + annotations + "]--------------", true);
+            //testMsg("--------------------[RepositoryCRUD.process annotations =" + annotations + "]--------------", true);
             if (annotations.size() == 0) {
                 return false;
             }
@@ -45,7 +45,7 @@ public class RepositoryCRUDProcessor extends AbstractProcessor {
 
             for (Element element : elements) {
                 RepositoryCRUD repository = element.getAnnotation(RepositoryCRUD.class);
-                testMsg("{ for Element element : elements}", false);
+                //testMsg("{ for Element element : elements}", false);
                 /**
                  * Analizo el tipo Objett
                  */
@@ -53,64 +53,64 @@ public class RepositoryCRUDProcessor extends AbstractProcessor {
                 
                 TypeMirror type = mirror(repository::entity);
                 if (type == null) {
-                    testMsg(">>>>>>>>>>> type== null", false);
+                    //testMsg(">>>>>>>>>>> type== null", false);
                 } else {
-                    testMsg("----------Search fields", false);
+                    //testMsg("----------Search fields", false);
                     Field[] allFields = type.getClass().getDeclaredFields();
                     for (Field field : allFields) {
 //        for(Field field:type.getClass().getDeclaredFields())){
-                        testMsg(":::field " + field.toGenericString() + "campo " + field.getName(), false);
+                        //testMsg(":::field " + field.toGenericString() + "campo " + field.getName(), false);
                     }
-                    testMsg("----------- pase el proceso.....", false);
+                    //testMsg("----------- pase el proceso.....", false);
                 }
 
-                testMsg("----------[element element.getKind() " + element.getKind().name(), false);
+                //testMsg("----------[element element.getKind() " + element.getKind().name(), false);
                 if (element.getKind() != ElementKind.INTERFACE) {
-                    testMsg("--->>>> paso 0.0", false);
+                    //testMsg("--->>>> paso 0.0", false);
                     error("The annotation @Repository can only be applied on interfaces: ",
                             element);
 
                 } else {
                     boolean error = false;
-                    testMsg(">>>>>>>>>>>paso 1", false);
-                    testMsg("---------------[type " + type.toString(), false);
-                    testMsg("---------------[type.getKind() " + type.getKind().name(), false);
-                    testMsg("---------------[type.type.getClass().getName() " + type.getClass().getName(), false);
+                    //testMsg(">>>>>>>>>>>paso 1", false);
+                    //testMsg("---------------[type " + type.toString(), false);
+                    //testMsg("---------------[type.getKind() " + type.getKind().name(), false);
+                    //testMsg("---------------[type.type.getClass().getName() " + type.getClass().getName(), false);
 //                    System.out.println(">>>repository.entity()"+repository.entity());
 //                    if (uniqueIdCheckList.contains(repository.entity())) {
                     /**
                      * Obtener el nombre de la entidad
                      */
                     String nameOfEntity = Util.nameOfFileInPath(type.toString());
-                    testMsg("---------------{ nameOfEntity " + nameOfEntity, false);
+                    //testMsg("---------------{ nameOfEntity " + nameOfEntity, false);
                     if (uniqueIdCheckList.contains(nameOfEntity)) {
 //                    if (uniqueIdCheckList.contains(repository.entity())) {
-                        testMsg("uniqueIdCheckList.contains(nameOfEntity)", false);
+                        //testMsg("uniqueIdCheckList.contains(nameOfEntity)", false);
                         error("Repository has should be uniquely defined", element);
                         error = true;
                     }
-                    testMsg("|>>>>>>>>>>>paso 2", false);
+                    //testMsg("|>>>>>>>>>>>paso 2", false);
 
 //                    error = !checkIdValidity(repository.entity().getName(), element);
                     error = !checkIdValidity(nameOfEntity, element);
-                    testMsg("|>>>>>>>>>>>paso 3 error= " + error, false);
+                    //testMsg("|>>>>>>>>>>>paso 3 error= " + error, false);
                     if (!error) {
-                        testMsg(">>>>>>>>>>>paso 4", false);
+                        //testMsg(">>>>>>>>>>>paso 4", false);
 //                        uniqueIdCheckList.add(repository.entity().getName());
                         uniqueIdCheckList.add(nameOfEntity);
                         try {
-                            testMsg(">>>>>>>>>>>paso 5 voy a generar la clase..", false);
+                            //testMsg(">>>>>>>>>>>paso 5 voy a generar la clase..", false);
 
                             generateClass(repository, element);
-                            testMsg(">>>>>>>>>>>paso 6", false);
+                            //testMsg(">>>>>>>>>>>paso 6", false);
                         } catch (Exception e) {
-                            testMsg(">>>>>>>>>> paso 6.1", false);
+                            //testMsg(">>>>>>>>>> paso 6.1", false);
                             error(e.getMessage(), null);
                         }
                     }
                 }
             }
-            testMsg("-----------------------------[end process]---------------------", false);
+            //testMsg("-----------------------------[end process]---------------------", false);
         } catch (Exception e) {
             System.out.println("-----------------------------------------------------------");
 
@@ -125,7 +125,7 @@ public class RepositoryCRUDProcessor extends AbstractProcessor {
     private void generateClass(RepositoryCRUD repository, Element element)
             throws Exception {
         try {
-            testMsg("generateClass(Repository repository, Element element)", true);
+            //testMsg("generateClass(Repository repository, Element element)", true);
 
             String pkg = getPackageName(element);
 
@@ -139,7 +139,7 @@ public class RepositoryCRUDProcessor extends AbstractProcessor {
             //using our ClassProccessor to delegate most of the string appending there
             ClassProccessorAux implClass = new ClassProccessorAux();
             implClass.definePackage(pkg);
-            testMsg("imports", false);
+            //testMsg("imports", false);
             /*
 Import
              */
@@ -248,7 +248,7 @@ Import
                     );
                 }
             }
-            testMsg("if (builder != null)", false);
+            //testMsg("if (builder != null)", false);
             if (builder != null) {
 
                 //generate create() method of the Builder class
@@ -271,7 +271,7 @@ Import
                 builder.addMethod(createMethod);
 
                 //generate build() method of the builder class.
-                testMsg("MethodProcessorAux buildMethod = new MethodProcessorAux()", false);
+                //testMsg("MethodProcessorAux buildMethod = new MethodProcessorAux()", false);
                 MethodProcessorAux buildMethod = new MethodProcessorAux()
                         .defineSignature("public", false, repository.entity().getName())
                         .name("build");
@@ -302,7 +302,7 @@ Import
             }
             //finally generate class via Filer
 //        generateClass(pkg + "." + repository.entity(), implClass.end());
-            testMsg("generateClass(pkg + \".\" + interfaceName + \"Impl\", implClass.end())", false);
+            //testMsg("generateClass(pkg + \".\" + interfaceName + \"Impl\", implClass.end())", false);
             generateClass(pkg + "." + interfaceName + "Impl", implClass.end());
         } catch (Exception e) {
             System.out.println("RepositoryCRUD.generateClass() " + e.getLocalizedMessage());
@@ -326,12 +326,12 @@ Import
     private void generateClass(String qfn, String end) throws IOException {
         try {
 
-            testMsg("RepositoryBasicProcessor.generateClass(String qfn , String end) =  " + qfn + " " + end, true);
+            //testMsg("RepositoryBasicProcessor.generateClass(String qfn , String end) =  " + qfn + " " + end, true);
             JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(qfn);
             Writer writer = sourceFile.openWriter();
             writer.write(end);
             writer.close();
-            testMsg("writer.close.()", false);
+            //testMsg("writer.close.()", false);
         } catch (Exception e) {
             System.out.println("RepositoryCRUD.generateClass() " + e.getLocalizedMessage());
         }
@@ -347,26 +347,26 @@ Import
         boolean valid = true;
         try {
 
-            testMsg("checkIdValidity(String name, Element e)=" + name, true);
+            //testMsg("checkIdValidity(String name, Element e)=" + name, true);
 
             for (int i = 0; i < name.length(); i++) {
                 if (i == 0 ? !Character.isJavaIdentifierStart(name.charAt(i))
                         : !Character.isJavaIdentifierPart(name.charAt(i))) {
                     error("Repository $as should be valid java "
                             + "identifier for code generation: " + name, e);
-                    testMsg("checkIdValidity .pas_1", false);
+                    //testMsg("checkIdValidity .pas_1", false);
 
                     valid = false;
                 }
             }
             if (name.equals(getTypeName(e))) {
                 error("AutoImplement $as should be different than the Interface name ", e);
-                testMsg("checkIdValidity.pas_2", false);
+                //testMsg("checkIdValidity.pas_2", false);
             }
         } catch (Exception ex) {
             System.out.println("RepositoryCRUD.checkIdValidity() " + ex.getLocalizedMessage());
         }
-        testMsg("valid = " + valid, false);
+        //testMsg("valid = " + valid, false);
         return valid;
     }
 // </editor-fold>
@@ -376,7 +376,7 @@ Import
      * Get the simple name of the TypeMirror
      */
     private String getTypeName(Element e) {
-        testMsg("String getTypeName(Element e)", true);
+        //testMsg("String getTypeName(Element e)", true);
         TypeMirror typeMirror = e.asType();
         String[] split = typeMirror.toString().split("\\.");
         try {
