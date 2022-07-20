@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 import com.avbravo.jmoordb.core.annotation.Repository;
+
 import static com.avbravo.jmoordb.core.annotation.app.MyAnnotationTypeProcessor.mirror;
 import com.avbravo.jmoordb.core.util.Util;
 import java.lang.reflect.Field;
-
 @SupportedAnnotationTypes(
         {"com.avbravo.jmoordb.core.annotation.Repository"})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
@@ -34,7 +34,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         try {
-            testMsg("--------------------[Repository.process annotations =" + annotations + "]--------------", true);
+            testMsg("--------------------[RepositoryCore.process annotations =" + annotations + "]--------------", true);
             if (annotations.size() == 0) {
                 return false;
             }
