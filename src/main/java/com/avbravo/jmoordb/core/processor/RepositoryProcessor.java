@@ -1,5 +1,6 @@
 package com.avbravo.jmoordb.core.processor;
 
+import com.avbravo.jmoordb.core.annotation.Query;
 import com.avbravo.jmoordb.core.processor.internal.ClassProccessorAux;
 import com.avbravo.jmoordb.core.processor.internal.MethodProcessorAux;
 import com.avbravo.jmoordb.core.processor.model.RepositoryFieldInfo;
@@ -25,6 +26,7 @@ import com.avbravo.jmoordb.core.annotation.Repository;
 import static com.avbravo.jmoordb.core.annotation.app.MyAnnotationTypeProcessor.mirror;
 import com.avbravo.jmoordb.core.util.Util;
 import java.lang.reflect.Field;
+import javax.lang.model.element.ExecutableElement;
 
 @SupportedAnnotationTypes(
         {"com.avbravo.jmoordb.core.annotation.Repository"})
@@ -51,9 +53,41 @@ public class RepositoryProcessor extends AbstractProcessor {
                  * Analizo el tipo Objett
                  */
                 testMsg("              [evaluando Anotacion]", true);
+
+                /**
+                 * ------------------------------------------------------ Esto
+                 * es para ver si tienen dos metodos @Query
+                 * --------------------------------------------
+                 */
+                testMsgBlock("       {Inicio de Analisis  metodos con @Query}", true);
+                ElementFilter.typesIn(roundEnv.getRootElements())
+                        .stream()
+                        .filter(this::implementsQueryInterface)
+                        .forEach(typeElement -> {
+
+                            List<ExecutableElement> methods
+                                    = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+
+                            testMsg("          [Imprimire la lista de metodos] ", true);
+                            methods.forEach(m -> {
+                                testMsg("          " + m.getSimpleName(), false);
+                            });
+
+//            if (!methods.stream().anyMatch(m -> m.getSimpleName().contentEquals("equals"))) {
+//               error( "'equals' method must be overridden for the class implementing " +
+//                                "com.logicbig.example.Data. \n Error class: " , typeElement);
+//            }
+                        });
+                testMsgBlock("       {Fin de Analisis metodos con @Query}", true);
+                /**
+                 * ------------------------------------------------------- Aqui
+                 * finaliza el analizador de @Query
+                 * ---------------------------------------
+                 */
+
                 TypeMirror type = mirror(repository::entity);
                 if (type == null) {
-                    testMsg(">>>>>>>>>>> type== null", false);
+                    testMsg("type== null", false);
                 } else {
                     //   testMsg("----------[Search fields[-------------------", false);
                     Field[] allFields = type.getClass().getDeclaredFields();
@@ -85,7 +119,7 @@ public class RepositoryProcessor extends AbstractProcessor {
                     testMsg("                 [ nameOfEntity " + nameOfEntity + "]", false);
                     if (uniqueIdCheckList.contains(nameOfEntity)) {
 //                    if (uniqueIdCheckList.contains(repository.entity())) {
-                        testMsg("uniqueIdCheckList.contains(nameOfEntity)", false);
+                        // testMsg("uniqueIdCheckList.contains(nameOfEntity)", false);
                         error("Repository has should be uniquely defined", element);
                         error = true;
                     }
@@ -371,5 +405,32 @@ Import
         if (marco) {
             System.out.println("___________________________________________________________");
         }
+    }
+
+    private void testMsgBlock(String msg, Boolean marco) {
+        String TAB = "|=       ";
+        if (marco) {
+
+            System.out.println("===============================================================");
+
+        }
+
+        System.out.println(TAB + msg + "     =|");
+
+        if (marco) {
+            System.out.println("================================================================");
+        }
+    }
+
+    /**
+     * Esto es para analizar los metodos
+     *
+     * @param typeElement
+     * @return
+     */
+    private boolean implementsQueryInterface(TypeElement typeElement) {
+        List<? extends TypeMirror> interfaces = typeElement.getInterfaces();
+        return interfaces.stream().anyMatch(theMirror
+                -> theMirror.toString().equals(Query.class.getName()));
     }
 }
