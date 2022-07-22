@@ -23,12 +23,15 @@ import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import javax.annotation.processing.Messager;
+import javax.tools.Diagnostic;
 
 /**
  * Converts getters to field
  */
 public class RepositoryMethodInfo {
 
+    private Messager messager;
     private final LinkedHashMap<String, String> fields;
     private final List<String> mandatoryFields;
 
@@ -55,7 +58,7 @@ public class RepositoryMethodInfo {
      * @param element
      * @return
      */
-    public static RepositoryMethodInfo get(Element element) {
+    public static RepositoryMethodInfo get(Element element, Messager messager) {
         LinkedHashMap<String, String> fields = new LinkedHashMap<>();
         List<String> mandatoryFields = new ArrayList<>();
 
@@ -69,6 +72,15 @@ public class RepositoryMethodInfo {
             String methodName = executableElement.getSimpleName().toString();
 
             ConsoleUtil.redBackground("methodName-->" + methodName);
+            if (!haveAnnotationValid(executableElement)) {
+                Test.box(" No tiene anotaciones validas para una interface Repository");
+               // printError(element, "No posee anotación valida para un Repositoiry");
+                /*
+                Aqui coloar el messger
+                
+                */
+                messager.printMessage(Diagnostic.Kind.ERROR, " No tiene anotaciones validas para una interface Repository", element);
+            }
 
             /**
              * Verifico si el metodo tiene anotación Query.classs
@@ -205,6 +217,11 @@ public class RepositoryMethodInfo {
                 Test.msg("_____________________________________________________");
             }
 
+            /**
+             * Falta aqui verificar cuando un metodo no tiene anotaciones enviar
+             * un mensaje de error
+             *
+             */
             String fieldName = methodToFieldName(methodName);
             if (fieldName == null) {
                 continue;
@@ -268,4 +285,36 @@ public class RepositoryMethodInfo {
     }
 
     // </editor-fold>
+    /**
+     * Verifica que tenga un anotación valida para el repositorio
+     *
+     * @param method
+     * @return
+     */
+    private static Boolean haveAnnotationValid(ExecutableElement executableElement) {
+        Boolean isValid = Boolean.FALSE;
+        try {
+            Query query = executableElement.getAnnotation(Query.class);
+            QueryJSON queryJSON = executableElement.getAnnotation(QueryJSON.class);
+            QueryRegex queryRegex = executableElement.getAnnotation(QueryRegex.class);
+            Count count = executableElement.getAnnotation(Count.class);
+            CountRegex countRegex = executableElement.getAnnotation(CountRegex.class);
+            Ping ping = executableElement.getAnnotation(Ping.class);
+            Save save = executableElement.getAnnotation(Save.class);
+            Delete delete = executableElement.getAnnotation(Delete.class);
+            Update update = executableElement.getAnnotation(Update.class);
+            if (query == null && queryJSON == null && queryRegex == null && count == null && countRegex == null && ping == null && save == null && delete == null && update == null) {
+
+            } else {
+                return Boolean.TRUE;
+            }
+
+
+        } catch (Exception e) {
+            Test.msg(Test.nameOfClassAndMethod() + " error() "+e.getLocalizedMessage());
+        }
+        return isValid;
+    }
+
+  
 }

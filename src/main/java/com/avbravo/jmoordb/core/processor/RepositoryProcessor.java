@@ -155,7 +155,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 /**
  * Procesa el contenido de la interface
  */
-            RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element);
+            RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element,messager);
 
             //the target interface name
             String interfaceName = getTypeName(element);

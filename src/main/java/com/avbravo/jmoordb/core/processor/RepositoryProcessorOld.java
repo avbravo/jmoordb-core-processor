@@ -23,7 +23,7 @@ import java.util.*;
 import com.avbravo.jmoordb.core.annotation.Repository;
 
 import static com.avbravo.jmoordb.core.annotation.app.MyAnnotationTypeProcessor.mirror;
-import com.avbravo.jmoordb.core.processor.model.RepositoryMethodInfo;
+import com.avbravo.jmoordb.core.processor.model.FieldInfo;
 import com.avbravo.jmoordb.core.util.Test;
 import com.avbravo.jmoordb.core.util.Util;
 import java.lang.reflect.Field;
@@ -186,8 +186,8 @@ public class RepositoryProcessorOld extends AbstractProcessor {
             String pkg = getPackageName(element);
 
             //delegate some processing to our FieldInfo class
-//        FieldInfo fieldInfo = FieldInfo.get(element);
-            RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element);
+        FieldInfo fieldInfo = FieldInfo.get(element);
+         //   RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element);
 
             //the target interface name
             String interfaceName = getTypeName(element);

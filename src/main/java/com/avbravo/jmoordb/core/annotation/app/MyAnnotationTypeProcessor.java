@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 import com.avbravo.jmoordb.core.annotation.Repository;
+import com.avbravo.jmoordb.core.processor.model.FieldInfo;
 import com.avbravo.jmoordb.core.processor.model.RepositoryMethodInfo;
 import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
@@ -99,7 +100,7 @@ public class MyAnnotationTypeProcessor extends AbstractProcessor {
 
         //delegate some processing to our FieldInfo class
 //        FieldInfo fieldInfo = FieldInfo.get(element);
-        RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element);
+        FieldInfo fieldInfo = FieldInfo.get(element);
 
         //the target interface name
         String interfaceName = getTypeName(element);
