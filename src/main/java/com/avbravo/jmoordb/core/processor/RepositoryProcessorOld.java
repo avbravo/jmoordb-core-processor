@@ -1,5 +1,6 @@
 package com.avbravo.jmoordb.core.processor;
 
+import com.avbravo.jmoordb.core.annotation.Query;
 import com.avbravo.jmoordb.core.processor.internal.ClassProccessorAux;
 import com.avbravo.jmoordb.core.processor.internal.MethodProcessorAux;
 
@@ -29,11 +30,12 @@ import java.lang.reflect.Field;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 
 @SupportedAnnotationTypes(
         {"com.avbravo.jmoordb.core.annotation.Repository"})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
-public class RepositoryProcessor extends AbstractProcessor {
+public class RepositoryProcessorOld extends AbstractProcessor {
 
     private Messager messager;
 
@@ -46,9 +48,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             if (annotations.size() == 0) {
                 return false;
             }
-/**
- * Lee los elementos que tengan la anotacion @Repository
- */
+
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Repository.class);
 
             List<String> uniqueIdCheckList = new ArrayList<>();
@@ -59,47 +59,70 @@ public class RepositoryProcessor extends AbstractProcessor {
                 /**
                  * Analizo Metodos
                  */
-//                testMsg("              [inicio evaluando @Query]", true);
-//                Set<? extends Element> annotatedElementsQuery = roundEnv.getElementsAnnotatedWith(Query.class);
-//                
-//
-//                for (Element elementQuery : annotatedElementsQuery) {
-//                    analizarMetodosQuery(elementQuery);
-//                }
-//
-//                testMsg("              [fin  evaluando @Query]", true);
+                 testMsg("              [inicio evaluando Metodos]", true);
+                Set<? extends Element> annotatedElementsQuery = roundEnv.getElementsAnnotatedWith(Query.class);
+               
+                for (Element elementQuery : annotatedElementsQuery) {
+                    analizarMetodos(elementQuery);
+                }
+
+                testMsg("              [fin evaluando Metodos]", true);
                 /**
                  * Fin de Analizo Metodos
                  */
-                
-                
-              
-                
 
                 /**
                  * Analizo el tipo Objett
                  */
                 testMsg("              [evaluando Anotacion]", true);
 
-              
-                      
+                /**
+                 * ------------------------------------------------------ Esto
+                 * es para ver si tienen dos metodos @Query
+                 * --------------------------------------------
+                 */
+                testMsgBlock("       {Inicio de Analisis  metodos con @Query}", true);
+                ElementFilter.typesIn(roundEnv.getRootElements())
+                        .stream()
+                        .filter(this::implementsQueryInterface)
+                        .forEach(typeElement -> {
+
+                            List<ExecutableElement> methods
+                                    = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+
+                            testMsg("          [Imprimire la lista de metodos] ", true);
+                            methods.forEach(m -> {
+                                testMsg("          " + m.getSimpleName(), false);
+                            });
+
+//            if (!methods.stream().anyMatch(m -> m.getSimpleName().contentEquals("equals"))) {
+//               error( "'equals' method must be overridden for the class implementing " +
+//                                "com.logicbig.example.Data. \n Error class: " , typeElement);
+//            }
+                        });
+                testMsgBlock("       {Fin de Analisis metodos con @Query}", true);
+                /**
+                 * ------------------------------------------------------- Aqui
+                 * finaliza el analizador de @Query
+                 * ---------------------------------------
+                 */
+
                 TypeMirror type = mirror(repository::entity);
                 if (type == null) {
                     testMsg("type== null", false);
                 } else {
                     //   testMsg("----------[Search fields[-------------------", false);
-//                    Field[] allFields = type.getClass().getDeclaredFields();
-//                    
-//                     
-//                   
-//                    for (Field field : allFields) {
-//                        //testMsg(":::field " + field.toGenericString() + "campo " + field.getName(), false);
-//                    }
+                    Field[] allFields = type.getClass().getDeclaredFields();
+                    for (Field field : allFields) {
+//        for(Field field:type.getClass().getDeclaredFields())){
+                        //testMsg(":::field " + field.toGenericString() + "campo " + field.getName(), false);
+                    }
+                    // testMsg("----------- [pase el proceso]................", false);
                 }
 
-
+                //            testMsg("----------[element element.getKind() " + element.getKind().name(), false);
                 if (element.getKind() != ElementKind.INTERFACE) {
-
+                    //  testMsg("--->>>> paso 0.0", false);
                     error("The annotation @Repository can only be applied on interfaces: ",
                             element);
 
@@ -107,25 +130,37 @@ public class RepositoryProcessor extends AbstractProcessor {
                     boolean error = false;
 
                     testMsg("                 [type " + type.toString(), false);
-
+//                    testMsg("               [type.getKind() " + type.getKind().name(), false);
+//                    testMsg("               [type.type.getClass().getName() " + type.getClass().getName(), false);
+//                    System.out.println(">>>repository.entity()"+repository.entity());
+//                    if (uniqueIdCheckList.contains(repository.entity())) {
                     /**
                      * Obtener el nombre de la entidad
                      */
                     String nameOfEntity = Util.nameOfFileInPath(type.toString());
                     testMsg("                 [ nameOfEntity " + nameOfEntity + "]", false);
                     if (uniqueIdCheckList.contains(nameOfEntity)) {
+//                    if (uniqueIdCheckList.contains(repository.entity())) {
+                        // testMsg("uniqueIdCheckList.contains(nameOfEntity)", false);
                         error("Repository has should be uniquely defined", element);
                         error = true;
                     }
+                    //    testMsg("|>>>>>>>>>>>paso 2", false);
 
+//                    error = !checkIdValidity(repository.entity().getName(), element);
                     error = !checkIdValidity(nameOfEntity, element);
+                    //     testMsg("|>>>>>>>>>>>paso 3 error= " + error, false);
                     if (!error) {
+                        // testMsg(">>>>>>>>>>>paso 4", false);
+//                        uniqueIdCheckList.add(repository.entity().getName());
                         uniqueIdCheckList.add(nameOfEntity);
                         try {
                             testMsg("                 <Generado la implementacion de clase>", false);
-                            generateClass(repository, element);
 
+                            generateClass(repository, element);
+                            // testMsg(">>>>>>>>>>>paso 6", false);
                         } catch (Exception e) {
+                            //  testMsg(">>>>>>>>>> paso 6.1", false);
                             error(e.getMessage(), null);
                         }
                     }
@@ -150,11 +185,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             String pkg = getPackageName(element);
 
-
-
-/**
- * Procesa el contenido de la interface
- */
+            //delegate some processing to our FieldInfo class
+//        FieldInfo fieldInfo = FieldInfo.get(element);
             RepositoryMethodInfo fieldInfo = RepositoryMethodInfo.get(element);
 
             //the target interface name
@@ -418,7 +450,13 @@ Import
      * @param typeElement
      * @return
      */
-    private void analizarMetodosQuery(Element element) {
+    private boolean implementsQueryInterface(TypeElement typeElement) {
+        List<? extends TypeMirror> interfaces = typeElement.getInterfaces();
+        return interfaces.stream().anyMatch(theMirror
+                -> theMirror.toString().equals(Query.class.getName()));
+    }
+
+    private void analizarMetodos(Element element) {
         try {
 
             if (element.getKind() == ElementKind.METHOD) {
@@ -438,25 +476,25 @@ Import
         // check for valid name
         String name = method.getSimpleName().toString();
         Test.msg("Metodo -->>" + name);
-//        if (!name.startsWith("set")) {
-//            printError(method, "setter name must start with \"set\"");
-//        } else if (name.length() == 3) {
-//            printError(method, "the method name must contain more than just \"set\"");
-//        } else if (Character.isLowerCase(name.charAt(3))) {
-//            if (method.getParameters().size() != 1) {
-//                printError(method, "character following \"set\" must be upper case");
-//            }
-//        }
+        if (!name.startsWith("set")) {
+            printError(method, "setter name must start with \"set\"");
+        } else if (name.length() == 3) {
+            printError(method, "the method name must contain more than just \"set\"");
+        } else if (Character.isLowerCase(name.charAt(3))) {
+            if (method.getParameters().size() != 1) {
+                printError(method, "character following \"set\" must be upper case");
+            }
+        }
 
         // check, if setter is public
-//        if (!method.getModifiers().contains(Modifier.PUBLIC)) {
-//            printError(method, "setter must be public");
-//        }
-//
-//        // check, if method is static
-//        if (method.getModifiers().contains(Modifier.STATIC)) {
-//            printError(method, "setter must not be static");
-//        }
+        if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+            printError(method, "setter must be public");
+        }
+
+        // check, if method is static
+        if (method.getModifiers().contains(Modifier.STATIC)) {
+            printError(method, "setter must not be static");
+        }
     }
 
     @Override
