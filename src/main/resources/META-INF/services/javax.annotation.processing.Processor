@@ -1,6 +1,6 @@
-com.avbravo.jmoordb.core.processor.AutoImplementProcessor 
-com.avbravo.jmoordb.core.processor.RepositoryBasicProcessor
-com.avbravo.jmoordb.core.processor.RepositoryProcessor
-com.avbravo.jmoordb.core.processor.RepositoryCRUDProcessor
-com.avbravo.jmoordb.core.processor.JsonObjectProcessor
-com.avbravo.jmoordb.core.annotation.app.MyAnnotationTypeProcessor
+com.jmoordb.core.processor.AutoImplementProcessor 
+com.jmoordb.core.processor.RepositoryBasicProcessor
+com.jmoordb.core.processor.RepositoryProcessor
+com.jmoordb.core.processor.RepositoryCRUDProcessor
+com.jmoordb.core.processor.JsonObjectProcessor
+com.jmoordb.core.annotation.app.MyAnnotationTypeProcessor
